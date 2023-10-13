@@ -1,12 +1,17 @@
 import { ChangeEvent, useState, useEffect } from "react";
 import axios from "axios";
-import { getTrackingSummoners, stopTracking, trackSummoner } from "../search";
+import {
+  testTrack,
+  testGetAllSummoners,
+  testGetSummoner,
+  testDeleteSummoner,
+} from "../search";
 import { useLoaderData } from "react-router-dom";
 import "./summoner.css";
 import Navbar from "./navbar";
 
+// page loader
 export async function loader({ params }) {
-  // const playerName = await getSummoner(params.summonerName);
   const playerName = params.summonerName;
   const reigion = params.reigion;
   return { playerName, reigion };
@@ -24,13 +29,15 @@ export default function App() {
   const [trackingDisabled, setTrackingDisabled] = useState(false);
   const [trackingPlayers, setTrackingPlayers] = useState([]);
 
+  // execute on page render
   useEffect(() => {
     setSearchText(playerName);
     setSelectedReigion(reigion);
-    // setTrackingPlayers(getTrackingSummoners());
+
+    // gets currently tracking players
     async function fetchData() {
       try {
-        const data = await getTrackingSummoners();
+        const data = await testGetAllSummoners();
         setTrackingPlayers(data);
       } catch (error) {
         console.error("error: ", error);
@@ -39,6 +46,7 @@ export default function App() {
     fetchData();
   }, []);
 
+  // search for player once searchText and selectedReigion are set
   useEffect(() => {
     if (searchText !== "" && selectedReigion !== "") {
       searchPlayerFromServer();
@@ -107,12 +115,14 @@ export default function App() {
   };
 
   useEffect(() => {
+    // if playerData is valid, get rank and checkInGame
     if (playerData.name !== "") {
       getPlayerRankFromServer();
       checkInGame();
 
+      // if player is already being tracked, disable tracking button
       for (let i = 0; i < trackingPlayers.length; i++) {
-        if (trackingPlayers[i].summonerName === playerData.name) {
+        if (trackingPlayers[i].description === playerData.name) {
           setTrackingDisabled(true);
         }
       }
@@ -195,7 +205,7 @@ export default function App() {
             }
           />
           <p>LEVEL: {playerData.summonerLevel}</p>
-          <button
+          {/* <button
             disabled={trackingDisabled}
             onClick={() => {
               trackSummoner(playerData.name, selectedReigion);
@@ -213,6 +223,40 @@ export default function App() {
             }}
           >
             Stop Tracking
+          </button> */}
+
+          <button
+            disabled={trackingDisabled}
+            onClick={() => {
+              testTrack(playerData.name, selectedReigion);
+              setTrackingDisabled(true);
+            }}
+          >
+            start tracking summoner
+          </button>
+          {/* <button
+            onClick={() => {
+              testGetAllSummoners();
+              setTrackingDisabled(true);
+            }}
+          >
+            test get all summoners
+          </button> */}
+          {/* <button
+            onClick={() => {
+              testGetSummoner(playerData.name);
+            }}
+          >
+            test get summoner
+          </button> */}
+          <button
+            disabled={!trackingDisabled}
+            onClick={() => {
+              testDeleteSummoner(playerData.name);
+              setTrackingDisabled(false);
+            }}
+          >
+            stop tracking summoner
           </button>
         </>
       ) : (

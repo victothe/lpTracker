@@ -106,43 +106,39 @@ router.get("/api/RIOT/getMatchInfo", async (req, res) => {
   }
 });
 
-router.post("/trackSummoner", async (req, res) => {
-  try {
-    const summoner = req.body;
-    trackingSummoners.push(summoner);
-    console.log(trackingSummoners);
-  } catch (error) {
-    console.error("Error making external API request:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
+// router.post("/trackSummoner", async (req, res) => {
+//   try {
+//     const summoner = req.body;
+//     trackingSummoners.push(summoner);
+//     console.log(trackingSummoners);
+//   } catch (error) {
+//     console.error("Error making external API request:", error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// });
 
-router.post("/stopTracking", async (req, res) => {
-  try {
-    const remove = req.body.name;
-    for (let i = 0; i < trackingSummoners.length; i++) {
-      if (trackingSummoners[i].summonerName === remove) {
-        trackingSummoners.splice(i, 1);
-      }
-    }
-  } catch (error) {
-    console.error("Error making external API request:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
+// router.post("/stopTracking", async (req, res) => {
+//   try {
+//     const remove = req.body.name;
+//     for (let i = 0; i < trackingSummoners.length; i++) {
+//       if (trackingSummoners[i].summonerName === remove) {
+//         trackingSummoners.splice(i, 1);
+//       }
+//     }
+//   } catch (error) {
+//     console.error("Error making external API request:", error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// });
 
-router.get("/trackingSummoners", async (req, res) => {
-  try {
-    const summoners = trackingSummoners;
-    res.json(summoners);
-  } catch (error) {
-    console.error("Error making external API request:", error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-});
-
-// router.get('/api/riot/notify'), async ( req, res) => {
-
-// }
+// router.get("/trackingSummoners", async (req, res) => {
+//   try {
+//     const summoners = trackingSummoners;
+//     res.json(summoners);
+//   } catch (error) {
+//     console.error("Error making external API request:", error);
+//     res.status(500).json({ error: "Internal Server Error" });
+//   }
+// });
 
 module.exports = router;
