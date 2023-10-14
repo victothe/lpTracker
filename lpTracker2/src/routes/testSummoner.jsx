@@ -276,12 +276,12 @@ export default function App() {
         </>
       ) : (
         <>
-          <p>No Ranked Data</p>
+          {/* <p>No Ranked Data</p> */}
         </>
       )}
       {currentGameInfo.gameQueueConfigId === null ? (
         <>
-          <p>Not Currently In Game</p>
+          {/* <p>Not Currently In Game</p> */}
         </>
       ) : (
         <>

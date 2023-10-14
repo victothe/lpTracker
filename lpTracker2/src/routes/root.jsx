@@ -12,8 +12,8 @@ export default function Root() {
   return (
     <>
       <Navbar />
-      <h2>League of Legends Summoner Tracker</h2>
-      <h4>Find a player and get notified when they finish a game</h4>
+      <h2>League of Legends LP Tracker</h2>
+      {/* <h4>Find a player and get notified when they finish a game</h4> */}
       <Form
         action={"summoners/" + selectedReigion + "/" + searchText}
         method="post"
