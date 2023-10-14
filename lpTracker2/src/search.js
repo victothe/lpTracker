@@ -36,12 +36,13 @@ import axios from "axios";
 //   return name;
 // }
 
-
-export async function testTrack(name, reigion) {
+export async function testTrack(name, reigion, playerId, recent, id) {
   const summoner = {
     summonerName: name,
-    createdAt: Date.now(),
+    puuid: playerId,
     selectedReigion: reigion,
+    mostRecentMatch: recent,
+    playerId: id,
   };
   try {
     const info = await axios.post(
@@ -59,6 +60,7 @@ export async function testGetAllSummoners() {
     const response = await axios.get(
       "http://localhost:3001/getTrackingSummoners"
     );
+    console.log(response.data);
     return response.data;
   } catch (error) {
     console.log("error");
@@ -91,3 +93,17 @@ export async function testDeleteSummoner(name) {
     console.log("error");
   }
 }
+
+export async function getMatchHistory(playerName) {
+    const name = playerName;
+    try {
+      const response = await axios.get(
+        `http://localhost:3001/getMatchHistory/${name}`
+      );
+    //   console.log(response.data);
+      return response.data;
+    } catch (error) {
+      console.log("error");
+      return [];
+    }
+  }

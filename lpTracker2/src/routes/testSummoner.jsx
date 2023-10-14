@@ -5,6 +5,7 @@ import {
   testGetAllSummoners,
   testGetSummoner,
   testDeleteSummoner,
+  getMatchHistory,
 } from "../search";
 import { useLoaderData } from "react-router-dom";
 import "./summoner.css";
@@ -14,10 +15,11 @@ import Navbar from "./navbar";
 export async function loader({ params }) {
   const playerName = params.summonerName;
   const reigion = params.reigion;
-  return { playerName, reigion };
+  const matches = await getMatchHistory(playerName);
+  return { playerName, reigion, matches };
 }
 
-// need to get backend to create new summoner?
+// uhhhh figure out...
 export async function action({ params }) {
   // const summoner = await createSummoner(params.summonerName);
   return null;
@@ -28,6 +30,8 @@ export default function App() {
   const [selectedReigion, setSelectedReigion] = useState("");
   const [trackingDisabled, setTrackingDisabled] = useState(false);
   const [trackingPlayers, setTrackingPlayers] = useState([]);
+  const [mostRecentMatch, setMostRecentMatch] = useState([]);
+  const [sortedMatches, setSortedmatches] = useState([]);
 
   // execute on page render
   useEffect(() => {
@@ -53,7 +57,7 @@ export default function App() {
     }
   }, [searchText, selectedReigion]);
 
-  const { playerName, reigion } = useLoaderData();
+  const { playerName, reigion, matches } = useLoaderData();
 
   const [playerData, setPlayerData] = useState({
     name: "",
@@ -119,12 +123,17 @@ export default function App() {
     if (playerData.name !== "") {
       getPlayerRankFromServer();
       checkInGame();
-
+      getMatch();
       // if player is already being tracked, disable tracking button
       for (let i = 0; i < trackingPlayers.length; i++) {
         if (trackingPlayers[i].description === playerData.name) {
           setTrackingDisabled(true);
         }
+      }
+
+      // reverses matches array
+      if (matches.length !== 0) {
+        setSortedmatches(matches.reverse());
       }
     }
   }, [playerData]);
@@ -189,6 +198,25 @@ export default function App() {
     }
   };
 
+  const getMatch = async () => {
+    let genReigion = "americas";
+    if (selectedReigion === "kr") {
+      genReigion = "asia";
+    } else if (selectedReigion === "euw1") {
+      genReigion = "europe";
+    }
+    try {
+      const response = await axios.get(
+        `http://localhost:3001/api/RIOT/getMatches?summonerPuuid=${playerData.puuid}&selectedReigion=${genReigion}`
+      );
+      setMostRecentMatch(response.data);
+      console.log(response.data);
+    } catch (error) {
+      // if not in game
+      console.error("error fetching data from server", error);
+    }
+  };
+
   return (
     <>
       <Navbar />
@@ -205,50 +233,22 @@ export default function App() {
             }
           />
           <p>LEVEL: {playerData.summonerLevel}</p>
-          {/* <button
-            disabled={trackingDisabled}
-            onClick={() => {
-              trackSummoner(playerData.name, selectedReigion);
-              setTrackingDisabled(true);
-              console.log(trackingPlayers);
-            }}
-          >
-            Track Player
-          </button>
-          <button
-            disabled={!trackingDisabled}
-            onClick={() => {
-              stopTracking(playerData.name);
-              setTrackingDisabled(false);
-            }}
-          >
-            Stop Tracking
-          </button> */}
 
           <button
             disabled={trackingDisabled}
             onClick={() => {
-              testTrack(playerData.name, selectedReigion);
+              testTrack(
+                playerData.name,
+                selectedReigion,
+                playerData.puuid,
+                mostRecentMatch[0],
+                playerData.id
+              );
               setTrackingDisabled(true);
             }}
           >
             start tracking summoner
           </button>
-          {/* <button
-            onClick={() => {
-              testGetAllSummoners();
-              setTrackingDisabled(true);
-            }}
-          >
-            test get all summoners
-          </button> */}
-          {/* <button
-            onClick={() => {
-              testGetSummoner(playerData.name);
-            }}
-          >
-            test get summoner
-          </button> */}
           <button
             disabled={!trackingDisabled}
             onClick={() => {
@@ -287,6 +287,21 @@ export default function App() {
         <>
           <p>CURRENTLY IN GAME</p>
         </>
+      )}
+      {sortedMatches.length ? (
+        <ul>
+          <h3>MATCH HISTORY</h3>
+          {sortedMatches.map((match) => (
+            <li key={match.gamestart}>
+              {match.rank} {match.lp}LP {match.winloss && "win"}{" "}
+              {!match.winloss && "loss"} {match.gamestart}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>
+          <i>No Games Tracked</i>
+        </p>
       )}
     </>
   );

@@ -20,11 +20,14 @@ app.use("/", router);
 
 app.post("/addSummoner", async (req, res) => {
   try {
-    const { summonerName, selectedReigion } = req.body;
-    console.log(`now tracking ${summonerName} ${selectedReigion}`);
+    const { summonerName, selectedReigion, puuid, mostRecentMatch, playerId } =
+      req.body;
+    console.log(
+      `now tracking ${summonerName} ${selectedReigion} ${puuid} ${mostRecentMatch} ${playerId}`
+    );
     const newSummoner = await pool.query(
-      "INSERT INTO info (description, reigion) VALUES($1, $2) RETURNING *",
-      [summonerName, selectedReigion]
+      "INSERT INTO info (description, reigion, puuid, recent, id) VALUES($1, $2, $3, $4, $5) RETURNING *",
+      [summonerName, selectedReigion, puuid, mostRecentMatch, playerId]
     );
 
     res.json(newSummoner.rows[0]);
@@ -62,7 +65,24 @@ app.delete("/deleteSummoner/:summonerName", async (req, res) => {
       "DELETE FROM info WHERE description = $1",
       [summonerName]
     );
-    res.json(`${summonerName} was deleted`)
+    const removeMatches = await pool.query(
+      "DELETE FROM matches WHERE summoner = $1",
+      [summonerName]
+    )
+    res.json(`${summonerName} was deleted`);
+  } catch (error) {
+    console.log(error.message);
+  }
+});
+
+app.get("/getMatchHistory/:name", async (req, res) => {
+  try {
+    const { name } = req.params;
+    const allMatches = await pool.query(
+      "SELECT * FROM matches where summoner = $1",
+      [name]
+    );
+    res.json(allMatches.rows);
   } catch (error) {
     console.log(error.message);
   }
