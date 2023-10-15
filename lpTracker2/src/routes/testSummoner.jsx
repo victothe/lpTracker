@@ -92,7 +92,7 @@ export default function App() {
   const searchPlayerFromServer = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:3001/api/RIOT/getPlayer?summonerName=${searchText}&selectedReigion=${selectedReigion}`
+        `https://lptracker-server.onrender.com/api/RIOT/getPlayer?summonerName=${searchText}&selectedReigion=${selectedReigion}`
       );
       setPlayerData({
         profileIconId: response.data.profileIconId,
@@ -159,7 +159,7 @@ export default function App() {
   const getPlayerRankFromServer = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:3001/api/RIOT/getRank?summonerId=${playerData.id}&selectedReigion=${selectedReigion}`
+        `https://lptracker-server.onrender.com/api/RIOT/getRank?summonerId=${playerData.id}&selectedReigion=${selectedReigion}`
       );
       setPlayerRank({
         queueType: "",
@@ -198,7 +198,7 @@ export default function App() {
   const checkInGame = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:3001/api/RIOT/inGame?summonerId=${playerData.id}&selectedReigion=${selectedReigion}`
+        `https://lptracker-server.onrender.com/api/RIOT/inGame?summonerId=${playerData.id}&selectedReigion=${selectedReigion}`
       );
       setCurrentGameInfo({
         gameQueueConfigId: response.data.gameQueueConfigId,
@@ -225,7 +225,7 @@ export default function App() {
     }
     try {
       const response = await axios.get(
-        `http://localhost:3001/api/RIOT/getMatches?summonerPuuid=${playerData.puuid}&selectedReigion=${genReigion}`
+        `https://lptracker-server.onrender.com/api/RIOT/getMatches?summonerPuuid=${playerData.puuid}&selectedReigion=${genReigion}`
       );
       setMostRecentMatch(response.data);
       // console.log(response.data);
