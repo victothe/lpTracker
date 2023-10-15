@@ -46,7 +46,7 @@ export async function testTrack(name, reigion, playerId, recent, id) {
   };
   try {
     const info = await axios.post(
-      "https://lptracker-server.onrender.com/addSummoner",
+      "http://localhost:3001/addSummoner",
       summoner
     );
     // console.log(info.data);
@@ -58,7 +58,7 @@ export async function testTrack(name, reigion, playerId, recent, id) {
 export async function testGetAllSummoners() {
   try {
     const response = await axios.get(
-      "https://lptracker-server.onrender.com/getTrackingSummoners"
+      "http://localhost:3001/getTrackingSummoners"
     );
     // console.log(response.data);
     return response.data;
@@ -72,7 +72,7 @@ export async function testGetSummoner(name) {
   const summonerName = name;
   try {
     const response = await axios.get(
-      `https://lptracker-server.onrender.com/getSummoner/${summonerName}`
+      `http://localhost:3001/getSummoner/${summonerName}`
     );
     // console.log(response.data);
     return response.data;
@@ -86,7 +86,7 @@ export async function testDeleteSummoner(name) {
   const summonerName = name;
   try {
     const response = await axios.delete(
-      `https://lptracker-server.onrender.com/deleteSummoner/${summonerName}`
+      `http://localhost:3001/deleteSummoner/${summonerName}`
     );
     console.log(response.data);
   } catch (error) {
@@ -98,7 +98,7 @@ export async function getMatchHistory(playerName) {
     const name = playerName;
     try {
       const response = await axios.get(
-        `https://lptracker-server.onrender.com/getMatchHistory/${name}`
+        `http://localhost:3001/getMatchHistory/${name}`
       );
     //   console.log(response.data);
       return response.data;
