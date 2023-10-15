@@ -7,7 +7,7 @@ import {
   testDeleteSummoner,
   getMatchHistory,
 } from "../search";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, redirect } from "react-router-dom";
 import "./summoner.css";
 import Navbar from "./navbar";
 
@@ -16,6 +16,13 @@ export async function loader({ params }) {
   const playerName = params.summonerName;
   const reigion = params.reigion;
   const matches = await getMatchHistory(playerName);
+  if (matches.length !== 0 && matches.length >= 1) {
+    for (let i = 1; i < matches.length; i++) {
+      if (matches[i].rank === matches[i - 1].rank) {
+        matches[i].change = matches[i].lp - matches[i - 1].lp;
+      }
+    }
+  }
   return { playerName, reigion, matches };
 }
 
@@ -138,6 +145,17 @@ export default function App() {
     }
   }, [playerData]);
 
+  // useEffect(() => {
+  //   if (sortedMatches.length !== 0 && sortedMatches.length >= 1) {
+  //     for (let i = 1; i < sortedMatches.length; i++) {
+  //       if (sortedMatches[i].rank === sortedMatches[i - 1].rank) {
+  //         sortedMatches[i].change =
+  //           sortedMatches[i].lp - sortedMatches[i - 1].lp;
+  //       }
+  //     }
+  //   }
+  // }, [sortedMatches]);
+
   const getPlayerRankFromServer = async () => {
     try {
       const response = await axios.get(
@@ -210,19 +228,44 @@ export default function App() {
         `http://localhost:3001/api/RIOT/getMatches?summonerPuuid=${playerData.puuid}&selectedReigion=${genReigion}`
       );
       setMostRecentMatch(response.data);
-      console.log(response.data);
+      // console.log(response.data);
     } catch (error) {
       // if not in game
       console.error("error fetching data from server", error);
     }
   };
 
+  function secondsToMinutesAndSeconds(totalSeconds) {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    // Create a formatted string
+    const timeString = `${minutes}m ${seconds}s`;
+
+    return timeString;
+  }
+
+  function unixTimestampToTimeString(unixTimestamp) {
+    // Create a Date object using the Unix timestamp (in milliseconds)
+    const date = new Date(unixTimestamp * 1000);
+
+    // Extract the components (hours, minutes, seconds)
+    const hours = date.getUTCHours().toString().padStart(2, "0");
+    const minutes = date.getUTCMinutes().toString().padStart(2, "0");
+    // const seconds = date.getUTCSeconds().toString().padStart(2, '0');
+
+    // Format the time string
+    const timeString = `${hours}:${minutes}`;
+
+    return timeString;
+  }
+
   return (
     <>
       <Navbar />
       {playerData.name !== "" ? (
         <>
-          <p>{playerData.name}</p>
+          <h4>{playerData.name}</h4>
           <img
             width="100"
             height="100"
@@ -275,14 +318,10 @@ export default function App() {
           </p>
         </>
       ) : (
-        <>
-          {/* <p>No Ranked Data</p> */}
-        </>
+        <>{/* <p>No Ranked Data</p> */}</>
       )}
       {currentGameInfo.gameQueueConfigId === null ? (
-        <>
-          {/* <p>Not Currently In Game</p> */}
-        </>
+        <>{/* <p>Not Currently In Game</p> */}</>
       ) : (
         <>
           <p>CURRENTLY IN GAME</p>
@@ -293,8 +332,8 @@ export default function App() {
           <h3>MATCH HISTORY</h3>
           {sortedMatches.map((match) => (
             <li key={match.gamestart}>
-              {match.rank} {match.lp}LP {match.winloss && "win"}{" "}
-              {!match.winloss && "loss"} {match.gamestart}
+              {match.winloss && "WIN"} {!match.winloss && "LOSS"} {match.lp} LP{" "}
+              {match.rank} Length: {secondsToMinutesAndSeconds(match.length)}{" "}
             </li>
           ))}
         </ul>

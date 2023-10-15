@@ -49,7 +49,7 @@ export async function testTrack(name, reigion, playerId, recent, id) {
       "http://localhost:3001/addSummoner",
       summoner
     );
-    console.log(info.data);
+    // console.log(info.data);
   } catch (error) {
     console.log("error");
   }
@@ -60,7 +60,7 @@ export async function testGetAllSummoners() {
     const response = await axios.get(
       "http://localhost:3001/getTrackingSummoners"
     );
-    console.log(response.data);
+    // console.log(response.data);
     return response.data;
   } catch (error) {
     console.log("error");
@@ -74,7 +74,7 @@ export async function testGetSummoner(name) {
     const response = await axios.get(
       `http://localhost:3001/getSummoner/${summonerName}`
     );
-    console.log(response.data);
+    // console.log(response.data);
     return response.data;
   } catch (error) {
     console.log("error");

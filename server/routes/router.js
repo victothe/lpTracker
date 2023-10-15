@@ -147,10 +147,12 @@ const poll = async () => {
         const matchdata = response.data.info.participants;
         const gameStart = response.data.info.gameStartTimestamp;
         let win = false;
+        let time = 0;
 
         for (let j = 0; j < matchdata.length; j++) {
           if (matchdata[j].summonerName === summoners[i].description) {
             win = matchdata[j].win;
+            time = matchdata[j].timePlayed;
           }
         }
 
@@ -178,8 +180,8 @@ const poll = async () => {
         const summonerName = summoners[i].description;
 
         const newMatch = await pool.query(
-          "INSERT INTO matches (winloss, rank, summoner, lp, gamestart) VALUES($1, $2, $3, $4, $5) RETURNING *",
-          [win, rank, summonerName, lp, gameStart]
+          "INSERT INTO matches (winloss, rank, summoner, lp, gamestart, length) VALUES($1, $2, $3, $4, $5, $6) RETURNING *",
+          [win, rank, summonerName, lp, gameStart, time]
         );
 
         // need to change summoners recent to new match
